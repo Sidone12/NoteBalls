@@ -1,13 +1,18 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import NavBar from './components/Layout/NavBar.vue';
+</script>
 
 <template>
-  <router-link to="/" class="button ">Notes</router-link> | 
-  <router-link to="/stats" class="button ">Stats</router-link>
-  <router-view />
+  <NavBar />
+  <div class="container is-max-desktop px-2 py-5">
+      <router-view />
+  </div>
 </template>
 
 <style scoped>
+
 </style>
+
 <style>
 @import 'bulma/css/bulma.min.css'
 </style>
