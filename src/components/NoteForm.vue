@@ -8,8 +8,9 @@
 
         <div class="field is-grouped is-grouped-right">
             <div class="control">
-                <button :disabled="!isNoteValid" @click="addNote" class="button is-link has-background-success">Add New
-                    Note</button>
+                <button :disabled="!isNoteValid" @click="addNote" class="button is-link has-background-success">
+                    Add New Note
+                </button>
             </div>
         </div>
     </div>
@@ -17,11 +18,10 @@
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { NoteType } from '@/types';
+import type { NoteType } from '@/types';
+import { useStoreNotes } from '@/stores/storeNotes';
 
-const emit = defineEmits<{
-    (e: 'add-note', note: NoteType): void;
-}>();
+const storeNotes = useStoreNotes();
 
 
 const newNote = ref('');
@@ -30,10 +30,11 @@ const focusInput = () => {
     noteInput.value?.focus();
 };
 
-
 const isNoteValid = computed(() => {
     return newNote.value.trim() !== '';
 });
+
+
 
 const addNote = () => {
     if (!isNoteValid.value) return;
@@ -42,14 +43,8 @@ const addNote = () => {
         id: Date.now(),
         content: newNote.value.trim(),
     };
-
-    emit('add-note', note);
+    storeNotes.addNote(note);
+    focusInput();
     newNote.value = '';
 };
-
-defineExpose({ focusInput });
 </script>
-
-<style>
-
-</style>

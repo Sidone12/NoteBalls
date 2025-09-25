@@ -4,27 +4,27 @@
             <div class="content">
                 {{ note.content }}
                 <div class="has-text-right has-text-grey-light">
-                   <small>{{ characterLength }}</small>
+                    <small>{{ characterLength }}</small>
                 </div>
             </div>
         </div>
         <footer class="card-footer">
-            <button class="card-footer-item">Edit</button>
-            <button @click="handleDeleteNote" class="card-footer-item">Delete</button>
+            <RouterLink class="card-footer-item" :to="`/editNote/${note.id}`">Edit</RouterLink>
+            <button @click="deleteNote(note.id)" class="card-footer-item">Delete</button>
         </footer>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { NoteType } from '@/types';
+import type { NoteType } from '@/types';
+import { useStoreNotes } from '@/stores/storeNotes';
+import { RouterLink } from 'vue-router';
+
+const storeNotes = useStoreNotes();
 
 const props = defineProps<{
     note: NoteType;
-}>();
-
-const emit = defineEmits<{
-    (e: 'delete-note', id: number): void;
 }>();
 
 const characterLength = computed(() => {
@@ -33,8 +33,8 @@ const characterLength = computed(() => {
     return `${length}: ${description}`;
 });
 
-const handleDeleteNote = () => {
-    emit('delete-note', props.note.id);
+const deleteNote = (id: number) => {
+    storeNotes.removeNote(id);
 };
 </script>
 
