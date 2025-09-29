@@ -1,0 +1,13 @@
+<template>
+  <div>
+    id is : {{ $route.params.id }}
+  </div>
+</template>
+
+<script lang="ts" setup>
+
+</script>
+
+<style>
+
+</style>
