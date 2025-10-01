@@ -17,11 +17,14 @@ import AddEditNote from '@/components/AddEditNote.vue';
 import Note from '@/components/Note.vue';
 import type { NoteType } from '@/types';
 import { useStoreNotes } from '@/stores/storeNotes';
+import { useWatchCharacters } from '@/use/useWatchCaracters';
 
 const storeNotes = useStoreNotes();
 
 const newNote = ref('');
 const addEditNoteRef = ref<InstanceType<typeof AddEditNote> | null>(null);
+
+useWatchCharacters(newNote, 100);
 
 const addNote = () => {
   const note: NoteType = {
@@ -32,4 +35,6 @@ const addNote = () => {
   newNote.value = '';
   addEditNoteRef.value?.focusTextarea();
 };
+
+
 </script>
