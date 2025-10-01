@@ -8,7 +8,7 @@
 
                 <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
                     :class="{ 'is-active': showMobileNav }" @click.prevent="showMobileNav = !showMobileNav"
-                    data-target="navbarBasicExample">
+                    data-target="navbarBasicExample" ref="navbarBurger">
                     <span aria-hidden="true"></span>
                     <span aria-hidden="true"></span>
                     <span aria-hidden="true"></span>
@@ -16,13 +16,14 @@
                 </a>
             </div>
 
-            <div id="navbarBasicExample" class="navbar-menu" :class="{ 'is-active': showMobileNav }">
+            <div ref="target" id="navbarBasicExample" class="navbar-menu" :class="{ 'is-active': showMobileNav }">
                 <div class="navbar-end">
                     <div class="buttons">
-                        <RouterLink to="/" class="navbar-item" active-class="is-active">
+                        <RouterLink @click="showMobileNav = false" to="/" class="navbar-item" active-class="is-active">
                             Notes
                         </RouterLink>
-                        <RouterLink to="/stats" class="navbar-item" active-class="is-active">
+                        <RouterLink @click="showMobileNav = false" to="/stats" class="navbar-item"
+                            active-class="is-active">
                             Stats
                         </RouterLink>
                     </div>
@@ -35,6 +36,16 @@
 <script lang="ts" setup>
 import { RouterLink } from 'vue-router';
 import { ref } from 'vue';
+import { onClickOutside } from '@vueuse/core'
+import { useTemplateRef } from 'vue'
+
+const target = useTemplateRef<HTMLElement>('target')
+const navbarBurger = useTemplateRef<HTMLElement>('navbarBurger')
+
+onClickOutside(target, () => showMobileNav.value = false , {
+    ignore: [navbarBurger]
+})
+
 const showMobileNav = ref(false)
 </script>
 
