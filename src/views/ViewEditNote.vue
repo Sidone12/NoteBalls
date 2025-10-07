@@ -24,11 +24,11 @@ const router = useRouter();
 
 const noteContent = ref('');
 
-noteContent.value = store.getNoteById(Number(route.params.id));
+noteContent.value = store.getNoteById(route.params.id as string);
 
 const updateNote = () => {
   if (!noteContent.value.trim()) return;
-  store.updateNote(Number(route.params.id), noteContent.value.trim());
+  store.updateNote(route.params.id as string, noteContent.value.trim());
   router.back();
 };
 

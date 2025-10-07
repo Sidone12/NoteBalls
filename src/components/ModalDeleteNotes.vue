@@ -32,7 +32,7 @@ const emits = defineEmits<{
 }>();
 const props = defineProps<{
     modelValue: boolean;
-    noteId: number;
+    noteId: string;
 }>();
 
 const closeModal = () => {

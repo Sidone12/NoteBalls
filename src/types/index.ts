@@ -1,4 +1,5 @@
 export interface NoteType {
-  id: number;
+  id: string;
   content: string;
+  date: string;
 }

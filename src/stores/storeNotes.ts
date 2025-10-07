@@ -1,58 +1,88 @@
 import {defineStore} from 'pinia';
 import {ref, computed} from 'vue';
 import type {NoteType} from '@/types/index';
+import {
+  collection,
+  onSnapshot,
+  deleteDoc,
+  updateDoc,
+  orderBy,
+  query,
+  addDoc,
+  doc,
+} from 'firebase/firestore';
+import {db} from '@/js/firebase.js';
+
+const notesCollectionsRef = collection(db, 'notes');
+const notesCollectionsQuery = query(notesCollectionsRef, orderBy('date', 'desc'));
 
 export const useStoreNotes = defineStore('notes', () => {
-  const notes = ref<NoteType[]>([
-    {
-      id: 1,
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus neciaculis mauris.',
-    },
-    {
-      id: 2,
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus neciaculis mauris.',
-    },
-    {
-      id: 3,
-      content: 'some text',
-    },
-  ]);
-  // Getters
-  const totalNotesCount = computed(() => notes.value.length);
+  //--- STATE ---
+  const notes = ref<NoteType[]>([]);
 
-  const totalCharactersCount = computed(() =>
-    notes.value.reduce((acc, note) => acc + note.content.length, 0)
-  );
-  const getNoteById = (id: number) => {
+  let loading = ref<boolean>(false);
+
+  // --- GETTERS ---
+  function totalNotesCount() {
+    return computed(() => notes.value.length);
+  }
+
+  function totalCharactersCount() {
+    return computed(() => notes.value.reduce((acc, note) => acc + note.content.length, 0));
+  }
+
+  function getNoteById(id: string) {
     return notes.value.find(note => note.id === id)?.content || '';
-  };
-  // Actions  
-  const addNote = (note: NoteType) => {
-    notes.value.unshift(note);
-  };
+  }
 
-  const removeNote = (noteId: number) => {
-    notes.value = notes.value.filter((n: NoteType) => {
-      return n.id !== noteId;
+  // --- ACTIONS ---
+
+  async function getNotes() {
+    loading.value = false;
+    onSnapshot(notesCollectionsQuery, querySnapshot => {
+      let notesArray: NoteType[] = [];
+      querySnapshot.forEach(doc => {
+        const note: NoteType = {
+          id: doc.id,
+          content: doc.data().content,
+          date: doc.data().date,
+        };
+        notesArray.push(note)
+       
+      });
+      notes.value = notesArray;
+      loading.value = true;
     });
-  };
-  
-  const updateNote = (id: number, newContent: string) => {
-    let note = notes.value.find(note => note.id === id);
-    if (note) {
-      note.content = newContent;
-    }
-  };
+  }
+
+  async function addNote(newNoteContent: string) {
+    const date = Date.now().toString();
+    await addDoc(notesCollectionsRef, {
+      content: newNoteContent,
+      date,
+    });
+  }
+
+  async function removeNote(noteId: string) {
+    console.log(noteId  );
+    await deleteDoc(doc(notesCollectionsRef, noteId));
+  }
+
+  async function updateNote(id: string, content: string) {
+    await updateDoc(doc(notesCollectionsRef, id), {
+      content,
+    });
+  }
 
   return {
     notes,
+    getNotes,
     addNote,
     removeNote,
-    getNoteById,
     updateNote,
     totalNotesCount,
     totalCharactersCount,
+    getNoteById,
+    loading,
   };
 });

@@ -3,8 +3,9 @@
         <div class="card-content">
             <div class="content">
                 {{ note.content }}
-                <div class="has-text-right has-text-grey-light">
-                    <small>{{ characterLength }}</small>
+                <div class="columns is-mobile has-text-grey-light mt-2">
+                    <small class="column">{{ formatted }}</small>
+                    <small class="column has-text-right">{{ characterLength }}</small>
                 </div>
             </div>
         </div>
@@ -12,7 +13,7 @@
             <RouterLink class="card-footer-item" :to="`/editNote/${note.id}`">Edit</RouterLink>
             <button @click="modals.deleteNote = true" class="card-footer-item">Delete</button>
         </footer>
-        <ModalDeleteNotes v-model="modals.deleteNote" v-if="modals.deleteNote" :noteId="note.id"  />
+        <ModalDeleteNotes v-model="modals.deleteNote" v-if="modals.deleteNote" :noteId="note.id" />
     </div>
 </template>
 
@@ -21,11 +22,17 @@ import { computed, reactive } from 'vue';
 import type { NoteType } from '@/types';
 import { RouterLink } from 'vue-router';
 import ModalDeleteNotes from './ModalDeleteNotes.vue';
+import { useDateFormat, useNow } from '@vueuse/core'
 
 
 const props = defineProps<{
     note: NoteType;
 }>();
+
+const formatted = computed(() => {
+    const date = new Date(parseInt(props.note.date))
+    return useDateFormat(date, 'DD MMM YYYY, HH:mm').value;
+})
 
 const characterLength = computed(() => {
     let length = props.note.content.length;
