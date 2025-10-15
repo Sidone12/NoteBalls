@@ -25,6 +25,7 @@ import { useWatchCharacters } from '@/use/useWatchCaracters';
 
 const storeNotes = useStoreNotes();
 
+
 const newNote = ref('');
 const addEditNoteRef = ref<InstanceType<typeof AddEditNote> | null>(null);
 

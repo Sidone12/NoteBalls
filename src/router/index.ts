@@ -18,6 +18,11 @@ const router = createRouter({
       name: 'edit-note',
       component: () => import('@/views/ViewEditNote.vue'),
     },
+    {
+      path: '/auth',
+      name: 'auth',
+      component: () => import('@/views/ViewAuth.vue'),
+    },
   ],
 });
 
