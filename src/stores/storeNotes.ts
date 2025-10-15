@@ -11,10 +11,14 @@ import {
   addDoc,
   doc,
 } from 'firebase/firestore';
-import {db} from '@/js/firebase.js';
+import { db } from '@/js/firebase.js';
+import { useStoreAuth } from '@/stores/storeAuth';
 
-const notesCollectionsRef = collection(db, 'notes');
-const notesCollectionsQuery = query(notesCollectionsRef, orderBy('date', 'desc'));
+
+import type { CollectionReference, Query } from 'firebase/firestore';
+
+let notesCollectionsRef: CollectionReference;
+let notesCollectionsQuery: Query;
 
 export const useStoreNotes = defineStore('notes', () => {
   //--- STATE ---
@@ -36,6 +40,17 @@ export const useStoreNotes = defineStore('notes', () => {
   }
 
   // --- ACTIONS ---
+  function init() {
+      const storeAuth = useStoreAuth(); 
+
+      if (!storeAuth.signedUser.id) {
+        throw new Error('User ID is missing');
+      }
+      notesCollectionsRef = collection(db, 'users', storeAuth.signedUser.id as string, 'notes');
+      notesCollectionsQuery = query(notesCollectionsRef, orderBy('date', 'desc'));
+    
+    getNotes();
+  }
 
   async function getNotes() {
     loading.value = false;
@@ -53,6 +68,10 @@ export const useStoreNotes = defineStore('notes', () => {
       notes.value = notesArray;
       loading.value = true;
     });
+  }
+
+  function clearNotes() {
+    notes.value = []
   }
 
   async function addNote(newNoteContent: string) {
@@ -84,5 +103,7 @@ export const useStoreNotes = defineStore('notes', () => {
     totalCharactersCount,
     getNoteById,
     loading,
+    init,
+    clearNotes,
   };
 });

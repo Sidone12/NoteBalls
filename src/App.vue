@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import NavBar from './components/Layout/NavBar.vue';
-import { useStoreNotes } from './stores/storeNotes';
-const store = useStoreNotes();
+import { useStoreAuth } from './stores/storeAuth';
 
-onMounted(()=> store.getNotes())
+const authStore = useStoreAuth();
+
+onMounted(() => authStore.init())
 </script>
 
 <template>
