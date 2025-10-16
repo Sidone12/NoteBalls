@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useStoreAuth } from '@/stores/storeAuth';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,5 +26,16 @@ const router = createRouter({
     },
   ],
 });
+
+router.beforeEach(async (to, from) => {
+  const storeAuth = useStoreAuth()
+
+  if (!storeAuth.signedUser.id && to.name !== 'auth') {
+    return { name: 'auth'}
+  }
+  if (storeAuth.signedUser.id && to.name === 'auth') {
+    return false
+  }
+})
 
 export default router
