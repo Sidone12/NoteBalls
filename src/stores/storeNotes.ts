@@ -11,11 +11,10 @@ import {
   addDoc,
   doc,
 } from 'firebase/firestore';
-import { db } from '@/js/firebase.js';
-import { useStoreAuth } from '@/stores/storeAuth';
+import {db} from '@/js/firebase.js';
+import {useStoreAuth} from '@/stores/storeAuth';
 
-
-import type { CollectionReference, Query } from 'firebase/firestore';
+import type {CollectionReference, Query} from 'firebase/firestore';
 
 let notesCollectionsRef: CollectionReference;
 let notesCollectionsQuery: Query;
@@ -27,28 +26,26 @@ export const useStoreNotes = defineStore('notes', () => {
   let loading = ref<boolean>(false);
 
   // --- GETTERS ---
-  function totalNotesCount() {
-    return computed(() => notes.value.length);
-  }
+  const totalNotesCount = computed(() => notes.value.length);
 
-  function totalCharactersCount() {
-    return computed(() => notes.value.reduce((acc, note) => acc + note.content.length, 0));
-  }
+  const totalCharactersCount = computed(() => {
+    return notes.value.reduce((acc, note) => acc + note.content.length, 0);
+  });
 
-  function getNoteById(id: string) {
+  const getNoteById = (id: string) => {
     return notes.value.find(note => note.id === id)?.content || '';
-  }
+  };
 
   // --- ACTIONS ---
   function init() {
-      const storeAuth = useStoreAuth(); 
+    const storeAuth = useStoreAuth();
 
-      if (!storeAuth.signedUser.id) {
-        throw new Error('User ID is missing');
-      }
-      notesCollectionsRef = collection(db, 'users', storeAuth.signedUser.id as string, 'notes');
-      notesCollectionsQuery = query(notesCollectionsRef, orderBy('date', 'desc'));
-    
+    if (!storeAuth.signedUser.id) {
+      throw new Error('User ID is missing');
+    }
+    notesCollectionsRef = collection(db, 'users', storeAuth.signedUser.id as string, 'notes');
+    notesCollectionsQuery = query(notesCollectionsRef, orderBy('date', 'desc'));
+
     getNotes();
   }
 
@@ -62,8 +59,7 @@ export const useStoreNotes = defineStore('notes', () => {
           content: doc.data().content,
           date: doc.data().date,
         };
-        notesArray.push(note)
-       
+        notesArray.push(note);
       });
       notes.value = notesArray;
       loading.value = true;
@@ -71,7 +67,7 @@ export const useStoreNotes = defineStore('notes', () => {
   }
 
   function clearNotes() {
-    notes.value = []
+    notes.value = [];
   }
 
   async function addNote(newNoteContent: string) {
@@ -83,7 +79,7 @@ export const useStoreNotes = defineStore('notes', () => {
   }
 
   async function removeNote(noteId: string) {
-    console.log(noteId  );
+    console.log(noteId);
     await deleteDoc(doc(notesCollectionsRef, noteId));
   }
 

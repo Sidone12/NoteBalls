@@ -24,4 +24,7 @@
 <script lang="ts" setup>
 import { useStoreNotes } from '@/stores/storeNotes';
 const store = useStoreNotes();
+
+console.log('store.totalNotesCount', store.totalNotesCount)
+console.log('store.totalCharactersCountt', store.totalCharactersCount)
 </script>
