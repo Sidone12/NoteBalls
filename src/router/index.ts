@@ -2,7 +2,7 @@ import {createRouter, createWebHashHistory} from 'vue-router';
 import { useStoreAuth } from '@/stores/storeAuth';
 
 const router = createRouter({
-  history: createWebHashHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(),
   routes: [
     {
       path: '/',
