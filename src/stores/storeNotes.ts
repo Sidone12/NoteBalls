@@ -22,7 +22,6 @@ let notesCollectionsQuery: Query;
 export const useStoreNotes = defineStore('notes', () => {
   //--- STATE ---
   const notes = ref<NoteType[]>([]);
-
   let loading = ref<boolean>(false);
 
   // --- GETTERS ---
@@ -32,9 +31,9 @@ export const useStoreNotes = defineStore('notes', () => {
     return notes.value.reduce((acc, note) => acc + note.content.length, 0);
   });
 
-  const getNoteById = (id: string) => {
+  const getNoteById = computed(() => (id: string) => {
     return notes.value.find(note => note.id === id)?.content || '';
-  };
+  });
 
   // --- ACTIONS ---
   function init() {
@@ -51,19 +50,25 @@ export const useStoreNotes = defineStore('notes', () => {
 
   async function getNotes() {
     loading.value = false;
-    onSnapshot(notesCollectionsQuery, querySnapshot => {
-      let notesArray: NoteType[] = [];
-      querySnapshot.forEach(doc => {
-        const note: NoteType = {
-          id: doc.id,
-          content: doc.data().content,
-          date: doc.data().date,
-        };
-        notesArray.push(note);
+
+    try {
+      onSnapshot(notesCollectionsQuery, querySnapshot => {
+        let notesArray: NoteType[] = [];
+        querySnapshot.forEach(doc => {
+          const note: NoteType = {
+            id: doc.id,
+            content: doc.data().content,
+            date: doc.data().date,
+          };
+          notesArray.push(note);
+        });
+        notes.value = notesArray;
+        loading.value = true;
       });
-      notes.value = notesArray;
-      loading.value = true;
-    });
+    } catch (err: any) {
+      loading.value = false;
+      console.error('Get notes error:', err);
+    }
   }
 
   function clearNotes() {
@@ -71,22 +76,34 @@ export const useStoreNotes = defineStore('notes', () => {
   }
 
   async function addNote(newNoteContent: string) {
-    const date = Date.now().toString();
-    await addDoc(notesCollectionsRef, {
-      content: newNoteContent,
-      date,
-    });
+    try {
+      const date = Date.now().toString();
+      await addDoc(notesCollectionsRef, {
+        content: newNoteContent,
+        date,
+      });
+    } catch (err: any) {
+      console.error('Add note error:', err);
+    } 
   }
 
   async function removeNote(noteId: string) {
-    console.log(noteId);
-    await deleteDoc(doc(notesCollectionsRef, noteId));
+    try {
+      console.log(noteId);
+      await deleteDoc(doc(notesCollectionsRef, noteId));
+    } catch (err: any) {
+      console.error('Remove note error:', err);
+    }
   }
 
   async function updateNote(id: string, content: string) {
-    await updateDoc(doc(notesCollectionsRef, id), {
-      content,
-    });
+    try {
+      await updateDoc(doc(notesCollectionsRef, id), {
+        content,
+      });
+    } catch (err: any) {
+      console.error('Update note error:', err);
+    }
   }
 
   return {
